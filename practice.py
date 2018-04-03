@@ -4,6 +4,8 @@ import acme_gym
 from scipy import integrate, linalg as la
 import time
 
+### These first two functions are just adapted from the inverted_pendulum lab
+
 def linearized_init(M, m, l, q1, q2, q3, q4, r):
     '''
     Adjusted for cart pole
@@ -62,6 +64,9 @@ def cart(tv, X0, A, B, Q, R, P):
     U = -np.dot(B,P@Z.T)/R
     return Z,U
 
+
+### This function isn't really finished, don't use it without revising
+
 def control(state):
     ''' determing control from state,
     this isn't used yet '''
@@ -82,6 +87,9 @@ def control(state):
                         -(p3 - m*(l**2)*thetap/3 + .5*m*l*xp*np.cos(theta))])
     integrate.odeint()
     return optcontrol
+
+
+### Stuff we care about running
 
 if __name__ == '__main__':
     env = gym.make('CartPoleContinuous-v0')
