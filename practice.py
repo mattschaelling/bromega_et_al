@@ -116,19 +116,21 @@ if __name__ == '__main__':
     done = False
     for i in range(T):
         if la.norm(obs[1:]) < tol:
-            if done:
-                pass
-            else:
-                done = True
-                iters = i
+            print("Converged in {} iterations".format(i))
+            time.sleep(1)
+            env.close()
+            break
             # Determine the step size based on our mode
-        z, u = cart(np.arange(i*.02,T,.02), obs, A,B,Q,R,P)
-        step = np.array([u[0]])
-        
-        # Step in designated direction and update the visual
-        obs, reward, state, info = env.step(step)
-        env.render()
-        time.sleep(.02)
+        else:
+            z, u = cart(np.arange(i*.02,T,.02), obs, A,B,Q,R,P)
+            step = np.array([u[0]])
+            
+            # Step in designated direction and update the visual
+            obs, reward, state, info = env.step(step)
+            env.render()
+            time.sleep(.02)
+            if i == (T-1):
+                print("Not converged, ",obs)
     """
     z, u = cart(np.arange(0,6,.02), obs, A,B,Q,R,P)
     z = z.astype(np.float32)
@@ -139,10 +141,7 @@ if __name__ == '__main__':
         env.render()
         time.sleep(.02)
     """
-    if done:
-        print("Converged in {} iterations".format(iters))
-    else:
-        print("Not converged, ",obs)
     
-    time.sleep(3)
+    
+    
     env.close()
