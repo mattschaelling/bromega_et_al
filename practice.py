@@ -30,10 +30,10 @@ def linearized_init(M, m, l, q1, q2, q3, q4, r):
     '''
     g = 9.8
     A = np.array([[0,1,0,0],
-                  [0,0,3*m*g/(4*M+m),0],
+                  [0,0,-3*m*g/(4*M+m),0],
                   [0,0,0,1],
                   [0,0,(9*m*g)/(8*l*M + 2*l*m) + 3*g/(2*l),0]])
-    B = np.array([0,1./(M + m/4), 0, 3./(2*l*(M + m/4))])
+    B = np.array([0,1./(M + m/4), 0, -3./(2*l*(M + m/4))])
     Q = np.diag([q1,q2,q3,q4])
     R = np.array([r])
     return A,B,Q,R
@@ -92,23 +92,44 @@ def control(state):
 ### Stuff we care about running
 
 if __name__ == '__main__':
+    T = round(6/0.02)
     env = gym.make('CartPoleContinuous-v0')
     obs = env.reset()
     env.render()
     #initial_state = np.array([0,0,.25,0])
     #env.state = initial_state
     #M,m,l = 1,.1,1
-    M,m,l = 1,.05,.5
+    M,m,l = 1,.1,.5
     A,B,Q,R = linearized_init(M,m,l,1,1,1,1,10)
     P = la.solve_continuous_are(A,B.reshape((4,1)),Q,R)
 
     z, u = cart(np.arange(0,10,.02), obs, A,B,Q,R,P)
     z = z.astype(np.float32)
     u = u.astype(np.float32)
-
+    tol = 1e-2
+    done = False
+    for i in range(T):
+        if la.norm(obs[1:]) < tol:
+            done = True
+            pass
+            # Determine the step size based on our mode
+        else:
+            z, u = cart(np.arange(i*.02,T,.02), obs, A,B,Q,R,P)
+            step = np.array([u[0]])
+            
+            # Step in designated direction and update the visual
+            obs, reward, state, info = env.step(step)
+            env.render()
+            time.sleep(.02)
+    """
     for i in range(len(u)):
         state, reward, done, info = env.step(np.array([u[i]]))
         env.render()
         time.sleep(.02)
+    """
+    if done:
+        print("Converged")
+    else:
+        print("Not converged, ",obs)
     time.sleep(3)
     env.close()
