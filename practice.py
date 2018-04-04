@@ -109,7 +109,7 @@ if __name__ == '__main__':
     #env.state = initial_state
     #M,m,l = 1,.1,1
     M,m,l = 1,.1,.5
-    A,B,Q,R = linearized_init(M,m,l,1,1,1,1,.1)
+    A,B,Q,R = linearized_init(M,m,l,0,1,1,1,.001)
     P = la.solve_continuous_are(A,B.reshape((4,1)),Q,R)
     
     tol = 1e-2
@@ -117,7 +117,7 @@ if __name__ == '__main__':
     for i in range(T):
         if la.norm(obs[1:]) < tol:
             print("Converged in {} iterations".format(i))
-            time.sleep(1)
+            #time.sleep(1)
             env.close()
             break
             # Determine the step size based on our mode
@@ -128,7 +128,7 @@ if __name__ == '__main__':
             # Step in designated direction and update the visual
             obs, reward, state, info = env.step(step)
             env.render()
-            time.sleep(.02)
+            #time.sleep(.02)
             if i == (T-1):
                 print("Not converged, ",obs)
     """
